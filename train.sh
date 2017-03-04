@@ -19,7 +19,7 @@ log="train.log"
 paddle train \
   --config=$cfg \
   --save_dir=./output \
-  --trainer_count=4 \
+  --trainer_count=1 \
   --log_period=1000 \
   --dot_period=10 \
   --num_passes=10 \

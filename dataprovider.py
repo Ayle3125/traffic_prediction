@@ -34,11 +34,19 @@ def initHook(settings, file_list, **kwargs):
     settings.pool_size = sys.maxint
     #Use a time seires of the past as feature.
     #Dense_vector's expression form is [float,float,...,float]
-    settings.input_types = [dense_vector(TERM_NUM)]
+
+    settings.input_types =[integer_value_sequence(TERM_NUM) ,
+                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),]
+                            #[dense_vector(TERM_NUM)]
     #There are next FORECASTING_NUM fragments you need predict.
     #Every predicted condition at time point has four states.
-    for i in range(FORECASTING_NUM):
-        settings.input_types.append(integer_value(LABEL_VALUE_NUM))
+    #for i in range(FORECASTING_NUM):
+    #    settings.input_types.append(integer_value(LABEL_VALUE_NUM))
 
 
 @provider(
@@ -54,15 +62,15 @@ def process(settings, file_name):
             # Scanning and generating samples
             for i in range(TERM_NUM, end_time - FORECASTING_NUM):
                 # For dense slot
-                pre_spd = map(float, speeds[i - TERM_NUM:i])
+                pre_spd = map(int, speeds[i - TERM_NUM:i])
 
                 # Integer value need predicting, values start from 0, so every one minus 1.
-                fol_spd = [j - 1 for j in speeds[i:i + FORECASTING_NUM]]
+                fol_spd = [int(j - 1) for j in speeds[i:i + FORECASTING_NUM]]
 
                 # Predicting label is missing, abandon the sample.
                 if -1 in fol_spd:
                     continue
-                yield [pre_spd] + fol_spd
+                yield  [pre_spd] + fol_spd
 
 
 def predict_initHook(settings, file_list, **kwargs):
