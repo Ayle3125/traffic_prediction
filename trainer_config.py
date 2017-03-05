@@ -39,8 +39,11 @@ settings(
 output_label = []
 forinput = []
 pre_speed = data_layer(name='pre_speed', size=TERM_NUM)
+time = data_layer(name='time', size=TERM_NUM)
+week = data_layer(name='week', size=TERM_NUM)
 #fol_speed = data_layer(name='fol_speed', size=TERM_NUM)
-forinput.append(pre_speed)
+#forinput.append(pre_speed)
+forinput = [pre_speed, time, week]
 for i in xrange(FORECASTING_NUM):
     # Each task share same weight.
     '''
@@ -52,6 +55,8 @@ for i in xrange(FORECASTING_NUM):
     link_param = ParamAttr(
         name='_par.w', initial_max=1.0, initial_min=-1.0)
     spd_vec = embedding_layer(input=pre_speed, size=emb_size, param_attr=ParameterAttribute(initial_std=0.))
+    time_vec = embedding_layer(input=time, size=emb_size, param_attr=ParameterAttribute(initial_std=0.))
+    week_vec = embedding_layer(input=week, size=emb_size, param_attr=ParameterAttribute(initial_std=0.))
     #cnt = concat_layer(input=[pre_speed,fol_speed])
     #emb_time = embedding_layer(input=time, size=emb_size, param_attr=ParamAttr(initial_mean=0.0,initial_std=0.01))
     hidden1 = mixed_layer(
@@ -64,6 +69,8 @@ for i in xrange(FORECASTING_NUM):
             #table_projection(pre_speed, param_attr=ParamAttr(initial_mean=0.0,initial_std=0.0001))
             #full_matrix_projection(input=pre_speed, size=emb_size,)
             full_matrix_projection(spd_vec),
+            full_matrix_projection(time_vec),
+            full_matrix_projection(week_vec),
             #full_matrix_projection(spd_vec)
             ])
 

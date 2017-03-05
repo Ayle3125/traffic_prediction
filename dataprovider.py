@@ -36,6 +36,8 @@ def initHook(settings, file_list, **kwargs):
     #Dense_vector's expression form is [float,float,...,float]
 
     settings.input_types =[integer_value_sequence(TERM_NUM) ,
+                            integer_value_sequence(TERM_NUM) ,
+                            integer_value_sequence(TERM_NUM) ,
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
@@ -54,7 +56,22 @@ def initHook(settings, file_list, **kwargs):
 def process(settings, file_name):
     with open(file_name) as f:
         #abandon fields name
-        f.next()
+        line = f.readline()
+        time_sequence = line.rstrip('\r\n').split(",")[1:]
+        time = []
+        week = []
+
+        for i in range(len(time_sequence)):
+            tmp_time = int(time_sequence[i])
+            time.append ( (tmp_time%10000)/100 ) #+ int(time_sequence[i][10:12])/60.0)
+            #2016 0301 0000 - 2016 0420 0800
+            month = (tmp_time%10000000)/1000000
+            date = ((tmp_time%1000000)/10000)
+            if month == 3:
+                week.append (( date + 2 ) / 7 )
+            else:
+                week.append (( date + 5 ) / 7 )
+
         for row_num, line in enumerate(f):
             speeds = map(int, line.rstrip('\r\n').split(",")[1:])
             # Get the max index.
@@ -63,14 +80,15 @@ def process(settings, file_name):
             for i in range(TERM_NUM, end_time - FORECASTING_NUM):
                 # For dense slot
                 pre_spd = map(int, speeds[i - TERM_NUM:i])
-
+                pre_time = map(int,time[i - TERM_NUM:i])
+                pre_week = map(int,week[i - TERM_NUM:i])
                 # Integer value need predicting, values start from 0, so every one minus 1.
                 fol_spd = [int(j - 1) for j in speeds[i:i + FORECASTING_NUM]]
 
                 # Predicting label is missing, abandon the sample.
                 if -1 in fol_spd:
                     continue
-                yield  [pre_spd] + fol_spd
+                yield  [pre_spd, pre_time, pre_week ]+fol_spd
 
 
 def predict_initHook(settings, file_list, **kwargs):
