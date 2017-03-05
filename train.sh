@@ -19,7 +19,7 @@ log="train.log"
 paddle train \
   --config=$cfg \
   --save_dir=./output \
-  --trainer_count=1 \
+  --trainer_count=4 \
   --log_period=1000 \
   --dot_period=10 \
   --num_passes=10 \
@@ -27,5 +27,7 @@ paddle train \
   --show_parameter_stats_period=3000 \
   2>&1 | tee $log
 
-  paddle usage -l $log -e $? -n "test" >/dev/null 2>&1
-  python -m paddle.utils.plotcurve -i $log > plot.png
+paddle usage -l $log -e $? -n "test" >/dev/null 2>&1
+python -m paddle.utils.plotcurve -i $log > plot.png
+python plot_curve.py -i $log -o "ploterror.png" classification_error_evaluator
+
