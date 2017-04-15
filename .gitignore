@@ -2,3 +2,6 @@ output/*
 output/
 /output/
 *.png
+*.log
+data/*.csv
+*.csv

@@ -16,7 +16,7 @@ set -e
 
 cfg=trainer_config.py
 # pass choice 
-model="output/pass-00000"
+model="output/pass-00049"
 paddle train \
     --config=$cfg \
     --use_gpu=false \

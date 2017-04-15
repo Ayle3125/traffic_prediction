@@ -93,16 +93,37 @@ def process(settings, file_name):
 
 def predict_initHook(settings, file_list, **kwargs):
     settings.pool_size = sys.maxint
-    settings.input_types = [dense_vector(TERM_NUM)]
+    settings.input_types = [integer_value_sequence(TERM_NUM) ,
+                            integer_value_sequence(TERM_NUM) ,
+                            integer_value_sequence(TERM_NUM) ]
 
 
 @provider(init_hook=predict_initHook, should_shuffle=False)
 def process_predict(settings, file_name):
     with open(file_name) as f:
-        #abandon fields name
-        f.next()
+    #abandon fields name
+        #f.next()
+        line = f.readline()
+        time_sequence = line.rstrip('\r\n').split(",")[1:]
+        time = []
+        week = []
+        for i in range(len(time_sequence)):
+            tmp_time = int(time_sequence[i])
+            time.append ( (tmp_time%10000)/100 ) #+ int(time_sequence[i][10:12])/60.0)
+            #2016 0301 0000 - 2016 0420 0800
+            month = (tmp_time%10000000)/1000000
+            date = ((tmp_time%1000000)/10000)
+            if month == 3:
+                week.append (( date + 2 ) / 7 )
+            else:
+                week.append (( date + 5 ) / 7 )
+
         for row_num, line in enumerate(f):
-            speeds = map(int, line.rstrip('\r\n').split(","))
-            end_time = len(speeds)
-            pre_spd = map(float, speeds[end_time - TERM_NUM:end_time])
-            yield pre_spd
+            speeds = map(int, line.rstrip('\r\n').split(",")[1:])
+            end_time = len(speeds)-1
+            pre_spd = map(int, speeds[end_time - TERM_NUM:end_time])
+            pre_time = map(int, time[end_time - TERM_NUM:end_time])
+            pre_week = map(int, week[end_time - TERM_NUM:end_time])
+
+            yield [pre_spd, pre_time, pre_week]
+
