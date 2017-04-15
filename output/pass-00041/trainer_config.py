@@ -23,17 +23,17 @@ define_py_data_sources2(
 ################################### Parameter Configuaration #######################################
 TERM_NUM = 24
 FORECASTING_NUM = 24
-emb_size = 24
+emb_size = 12
 with_rnn =True #False
-hidden_dim = 4 #TODO
+hidden_dim = 16 #TODO
 initial_std = 0.0001
 param_attr = ParamAttr(initial_std=initial_std)
 batch_size = 128 if not is_predict else 1
 settings(
     batch_size=batch_size,
-    learning_rate=5e-2, #TODO
+    learning_rate=1e-3, #TODO
     regularization=L2Regularization(batch_size * 1e-5),
-    learning_method=RMSPropOptimizer()) #TODO ())AdaGradOptimizer
+    learning_method=AdamOptimizer()) #RMSPropOptimizer()) #TODO ())AdaGradOptimizer
 ################################### Algorithm Configuration ########################################
 
 output_label = []
@@ -84,8 +84,8 @@ for i in xrange(FORECASTING_NUM):
 
     hidden2 = mixed_layer(
         size=hidden_dim,
-        #act=STanhActivation(),
-        act=SigmoidActivation(),
+        act=STanhActivation(),
+        #act=SigmoidActivation(),
         bias_attr=True,
         input=[full_matrix_projection(hidden1)] +
             ([full_matrix_projection(

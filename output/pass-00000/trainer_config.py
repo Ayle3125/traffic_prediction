@@ -84,8 +84,8 @@ for i in xrange(FORECASTING_NUM):
 
     hidden2 = mixed_layer(
         size=hidden_dim,
-        #act=STanhActivation(),
-        act=SigmoidActivation(),
+        act=STanhActivation(),
+        #act=SigmoidActivation(),
         bias_attr=True,
         input=[full_matrix_projection(hidden1)] +
             ([full_matrix_projection(

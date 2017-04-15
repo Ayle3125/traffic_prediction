@@ -1,5 +1,5 @@
-paddle version: 3978e0ba61d27b6d36dbb0e42f2e13ee8d617c68
-	withGpu: true
+paddle version: 6146a2eb724be2e707e642937a343decf2bf0950
+	withGpu: false
 	withAvx: true
 	withPyDataProvider: true
 	withTimer: false
