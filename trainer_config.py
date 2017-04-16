@@ -23,27 +23,25 @@ define_py_data_sources2(
 ################################### Parameter Configuaration #######################################
 TERM_NUM = 24
 FORECASTING_NUM = 24
-emb_size = 12
-with_rnn =True #False
-hidden_dim = 16 #TODO
+emb_size = 4
+lstm_dim= 64
+with_rnn =False #False
+hidden_dim = 24 #TODO
 initial_std = 0.0001
 param_attr = ParamAttr(initial_std=initial_std)
 batch_size = 128 if not is_predict else 1
 settings(
     batch_size=batch_size,
-    learning_rate=1e-3, #TODO
-    regularization=L2Regularization(batch_size * 1e-5),
+    learning_rate=1e-2, #TODO
+    regularization=L2Regularization(batch_size * 8e-4),
     learning_method=AdamOptimizer()) #RMSPropOptimizer()) #TODO ())AdaGradOptimizer
 ################################### Algorithm Configuration ########################################
-
 output_label = []
 forinput = []
 pre_speed = data_layer(name='pre_speed', size=TERM_NUM)
-time = data_layer(name='time', size=TERM_NUM)
-week = data_layer(name='week', size=TERM_NUM)
-#fol_speed = data_layer(name='fol_speed', size=TERM_NUM)
-#forinput.append(pre_speed)
-forinput = [pre_speed, time, week]
+#time = data_layer(name='time', size=TERM_NUM)
+#week = data_layer(name='week', size=TERM_NUM)
+forinput = [pre_speed] #, time, week
 for i in xrange(FORECASTING_NUM):
     # Each task share same weight.
     '''
@@ -55,8 +53,8 @@ for i in xrange(FORECASTING_NUM):
     link_param = ParamAttr(
         name='_par.w', initial_max=1.0, initial_min=-1.0)
     spd_vec = embedding_layer(input=pre_speed, size=emb_size, param_attr=ParameterAttribute(initial_std=0.))
-    time_vec = embedding_layer(input=time, size=emb_size, param_attr=ParameterAttribute(initial_std=0.))
-    week_vec = embedding_layer(input=week, size=emb_size, param_attr=ParameterAttribute(initial_std=0.))
+    #time_vec = embedding_layer(input=time, size=emb_size, param_attr=ParameterAttribute(initial_std=0.))
+    #week_vec = embedding_layer(input=week, size=emb_size, param_attr=ParameterAttribute(initial_std=0.))
     #cnt = concat_layer(input=[pre_speed,fol_speed])
     #emb_time = embedding_layer(input=time, size=emb_size, param_attr=ParamAttr(initial_mean=0.0,initial_std=0.01))
     hidden1 = mixed_layer(
@@ -69,51 +67,18 @@ for i in xrange(FORECASTING_NUM):
             #table_projection(pre_speed, param_attr=ParamAttr(initial_mean=0.0,initial_std=0.0001))
             #full_matrix_projection(input=pre_speed, size=emb_size,)
             full_matrix_projection(spd_vec),
-            full_matrix_projection(time_vec),
-            full_matrix_projection(week_vec),
+            #full_matrix_projection(time_vec),
+            #full_matrix_projection(week_vec),
             #full_matrix_projection(spd_vec)
             ])
 
-
-    if with_rnn:
-        rnn1 = recurrent_layer(
-            input=hidden1,
-            act=SigmoidActivation(),
-            bias_attr=True,
-            param_attr=param_attr, )
-
-    hidden2 = mixed_layer(
-        size=hidden_dim,
-        act=STanhActivation(),
-        #act=SigmoidActivation(),
-        bias_attr=True,
-        input=[full_matrix_projection(hidden1)] +
-            ([full_matrix_projection(
-            rnn1, param_attr=ParamAttr(initial_mean=0.0,initial_std=0.0001))] if with_rnn else []), )
-
-    if with_rnn:
-        rnn2 = recurrent_layer(
-            input=hidden2,
-            reverse=True,
-            act=SigmoidActivation(),
-            bias_attr=True,
-            param_attr=ParamAttr(initial_mean=0.0,initial_std=0.0001), )
-    pool_input = mixed_layer(
-        size=hidden_dim,
-        #act=STanhActivation(),
-        act=SigmoidActivation(),
-        bias_attr=True,
-        input=[full_matrix_projection(hidden2)] +
-            ([full_matrix_projection(
-            rnn2, param_attr=ParamAttr(initial_mean=0.0,initial_std=0.0001))] if with_rnn else []), )
-
-    pool = pooling_layer(input=pool_input,pooling_type=AvgPooling())
-
+    bi_lstm = bidirectional_lstm(input=hidden1, size=lstm_dim)
+    dropout = dropout_layer(input=bi_lstm, dropout_rate=0.5)
     score = fc_layer(
         size=4,
         act=SoftmaxActivation(),
         bias_attr=False,
-        input=pool,)
+        input=dropout,)
 
     if is_predict:
         maxid = maxid_layer(score)

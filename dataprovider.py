@@ -36,8 +36,8 @@ def initHook(settings, file_list, **kwargs):
     #Dense_vector's expression form is [float,float,...,float]
 
     settings.input_types =[integer_value_sequence(TERM_NUM) ,
-                            integer_value_sequence(TERM_NUM) ,
-                            integer_value_sequence(TERM_NUM) ,
+                            #integer_value_sequence(TERM_NUM) ,
+                            #integer_value_sequence(TERM_NUM) ,
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
@@ -88,9 +88,10 @@ def process(settings, file_name):
                 # Predicting label is missing, abandon the sample.
                 if -1 in fol_spd:
                     continue
-                yield  [pre_spd, pre_time, pre_week ]+fol_spd
+                #yield  [pre_spd, pre_time, pre_week ]+fol_spd
+                yield  [pre_spd ]+fol_spd
 
-
+'''
 def predict_initHook(settings, file_list, **kwargs):
     settings.pool_size = sys.maxint
     settings.input_types = [integer_value_sequence(TERM_NUM) ,
@@ -126,4 +127,4 @@ def process_predict(settings, file_name):
             pre_week = map(int, week[end_time - TERM_NUM:end_time])
 
             yield [pre_spd, pre_time, pre_week]
-
+'''
