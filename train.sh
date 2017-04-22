@@ -24,10 +24,8 @@ paddle train \
   --dot_period=10 \
   --num_passes=10 \
   --use_gpu=false\
-  --show_parameter_stats_period=3000 \
   2>&1 | tee $log
 
 paddle usage -l $log -e $? -n "test" >/dev/null 2>&1
-python -m paddle.utils.plotcurve -i $log > plot.png
-python plot_curve.py -i $log -o "ploterror.png" classification_error_evaluator
-
+#python -m paddle.utils.plotcurve -i $log > plot.png
+#python plot_curve.py -i $log -o "ploterror.png" classification_error_evaluator
