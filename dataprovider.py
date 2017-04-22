@@ -99,12 +99,23 @@ def process(settings, file_name):
                 #yield  [pre_spd ]+fol_spd
                 yield [pre_road, pre_spd, fol_road] + fol_spd
 
-'''
+
 def predict_initHook(settings, file_list, **kwargs):
-    settings.pool_size = sys.maxint
-    settings.input_types = [integer_value_sequence(TERM_NUM) ,
-                            integer_value_sequence(TERM_NUM) ,
-                            integer_value_sequence(TERM_NUM) ]
+        del kwargs  #unused
+
+        settings.pool_size = sys.maxint
+        #Use a time seires of the past as feature.
+        #Dense_vector's expression form is [float,float,...,float]
+
+        settings.input_types =[integer_value_sequence(TERM_NUM) ,
+                                integer_value_sequence(TERM_NUM) ,
+                                integer_value_sequence(TERM_NUM) ,
+                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
+                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),]
 
 
 @provider(init_hook=predict_initHook, should_shuffle=False)
@@ -126,13 +137,19 @@ def process_predict(settings, file_name):
                 week.append (( date + 2 ) / 7 )
             else:
                 week.append (( date + 5 ) / 7 )
-
-        for row_num, line in enumerate(f):
-            speeds = map(int, line.rstrip('\r\n').split(",")[1:])
+        while 1:
+            line1 = f.readline()
+            line2 = f.readline()
+            line3 = f.readline()
+            if not line3:
+                break
+            _pre_road = map(int, line1.rstrip('\r\n').split(",")[1:])
+            speeds = map(int, line2.rstrip('\r\n').split(",")[1:])
+            _fol_road = map(int, line3.rstrip('\r\n').split(",")[1:])
             end_time = len(speeds)-1
+            # Scanning and generating samples
             pre_spd = map(int, speeds[end_time - TERM_NUM:end_time])
             pre_time = map(int, time[end_time - TERM_NUM:end_time])
             pre_week = map(int, week[end_time - TERM_NUM:end_time])
-
-            yield [pre_spd, pre_time, pre_week]
-'''
+            yield [pre_road, pre_spd, fol_road]
+            #yield [pre_spd, pre_time, pre_week]
