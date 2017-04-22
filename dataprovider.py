@@ -78,14 +78,9 @@ def process(settings, file_name):
             if not line3:
                 break
             _pre_road = map(int, line1.rstrip('\r\n').split(",")[1:])
-            speeds = map(int, line2.rstrip('\r\n').split(","))
+            speeds = map(int, line2.rstrip('\r\n').split(",")[1:])
             _fol_road = map(int, line3.rstrip('\r\n').split(",")[1:])
             end_time = len(speeds)-1
-
-        #for row_num, line in enumerate(f):
-        #    speeds = map(int, line.rstrip('\r\n').split(",")[1:])
-            # Get the max index.
-        #    end_time = len(speeds)
             # Scanning and generating samples
             for i in range(TERM_NUM, end_time - FORECASTING_NUM):
                 # For dense slot

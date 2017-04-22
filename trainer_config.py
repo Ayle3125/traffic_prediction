@@ -77,12 +77,12 @@ for i in xrange(FORECASTING_NUM):
 
     bi_lstm = bidirectional_lstm(input=hidden1, size=lstm_dim)
     dropout = dropout_layer(input=bi_lstm, dropout_rate=0.5)
-    pool = pooling_layer(input=dropout,pooling_type=AvgPooling())
+    #pool = pooling_layer(input=dropout,pooling_type=AvgPooling())
     score = fc_layer(
         size=4,
         act=SoftmaxActivation(),
         bias_attr=False,
-        input=pool,)
+        input=dropout,)
 
     if is_predict:
         maxid = maxid_layer(score)
