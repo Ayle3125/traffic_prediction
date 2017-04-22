@@ -36,8 +36,8 @@ def initHook(settings, file_list, **kwargs):
     #Dense_vector's expression form is [float,float,...,float]
 
     settings.input_types =[integer_value_sequence(TERM_NUM) ,
-                            #integer_value_sequence(TERM_NUM) ,
-                            #integer_value_sequence(TERM_NUM) ,
+                            integer_value_sequence(TERM_NUM) ,
+                            integer_value_sequence(TERM_NUM) ,
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
@@ -71,15 +71,27 @@ def process(settings, file_name):
                 week.append (( date + 2 ) / 7 )
             else:
                 week.append (( date + 5 ) / 7 )
+        while 1:
+            line1 = f.readline()
+            line2 = f.readline()
+            line3 = f.readline()
+            if not line3:
+                break
+            _pre_road = map(int, line1.rstrip('\r\n').split(",")[1:])
+            speeds = map(int, line2.rstrip('\r\n').split(","))
+            _fol_road = map(int, line3.rstrip('\r\n').split(",")[1:])
+            end_time = len(speeds)-1
 
-        for row_num, line in enumerate(f):
-            speeds = map(int, line.rstrip('\r\n').split(",")[1:])
+        #for row_num, line in enumerate(f):
+        #    speeds = map(int, line.rstrip('\r\n').split(",")[1:])
             # Get the max index.
-            end_time = len(speeds)
+        #    end_time = len(speeds)
             # Scanning and generating samples
             for i in range(TERM_NUM, end_time - FORECASTING_NUM):
                 # For dense slot
+                pre_road = map(int, _pre_road[i - TERM_NUM:i])
                 pre_spd = map(int, speeds[i - TERM_NUM:i])
+                fol_road = map(int, _fol_road[i - TERM_NUM:i])
                 pre_time = map(int,time[i - TERM_NUM:i])
                 pre_week = map(int,week[i - TERM_NUM:i])
                 # Integer value need predicting, values start from 0, so every one minus 1.
@@ -89,7 +101,8 @@ def process(settings, file_name):
                 if -1 in fol_spd:
                     continue
                 #yield  [pre_spd, pre_time, pre_week ]+fol_spd
-                yield  [pre_spd ]+fol_spd
+                #yield  [pre_spd ]+fol_spd
+                yield [pre_road, pre_spd, fol_road] + fol_spd
 
 '''
 def predict_initHook(settings, file_list, **kwargs):
