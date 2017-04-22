@@ -38,6 +38,8 @@ def initHook(settings, file_list, **kwargs):
     settings.input_types =[integer_value_sequence(TERM_NUM) ,
                             integer_value_sequence(TERM_NUM) ,
                             integer_value_sequence(TERM_NUM) ,
+                            integer_value_sequence(TERM_NUM) ,
+                            integer_value_sequence(TERM_NUM) ,
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
                             integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
@@ -97,7 +99,7 @@ def process(settings, file_name):
                     continue
                 #yield  [pre_spd, pre_time, pre_week ]+fol_spd
                 #yield  [pre_spd ]+fol_spd
-                yield [pre_road, pre_spd, fol_road] + fol_spd
+                yield [pre_road, pre_spd, fol_road, pre_time, pre_week] + fol_spd
 
 
 def predict_initHook(settings, file_list, **kwargs):
@@ -108,6 +110,9 @@ def predict_initHook(settings, file_list, **kwargs):
         #Dense_vector's expression form is [float,float,...,float]
 
         settings.input_types =[integer_value_sequence(TERM_NUM) ,
+                                integer_value_sequence(TERM_NUM) ,
+                                integer_value_sequence(TERM_NUM) ,
+
                                 integer_value_sequence(TERM_NUM) ,
                                 integer_value_sequence(TERM_NUM) ,
                                 integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
@@ -151,5 +156,5 @@ def process_predict(settings, file_name):
             pre_spd = map(int, speeds[end_time - TERM_NUM:end_time])
             pre_time = map(int, time[end_time - TERM_NUM:end_time])
             pre_week = map(int, week[end_time - TERM_NUM:end_time])
-            yield [pre_road, pre_spd, fol_road]
+            yield [pre_road, pre_spd, fol_road, pre_time, pre_week]
             #yield [pre_spd, pre_time, pre_week]
