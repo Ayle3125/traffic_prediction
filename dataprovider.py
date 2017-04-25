@@ -16,7 +16,7 @@ from paddle.trainer.PyDataProvider2 import *
 import sys
 import numpy as np
 TERM_NUM = 24
-FORECASTING_NUM = 24
+FORECASTING_NUM = 1
 LABEL_VALUE_NUM = 4
 
 
@@ -40,12 +40,7 @@ def initHook(settings, file_list, **kwargs):
                             integer_value_sequence(TERM_NUM) ,
                             integer_value_sequence(TERM_NUM) ,
                             integer_value_sequence(TERM_NUM) ,
-                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                            integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),]
+                            integer_value(LABEL_VALUE_NUM),]
                             #[dense_vector(TERM_NUM)]
     #There are next FORECASTING_NUM fragments you need predict.
     #Every predicted condition at time point has four states.

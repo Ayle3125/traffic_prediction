@@ -22,11 +22,11 @@ define_py_data_sources2(
     train_list=trn, test_list=tst, module="dataprovider", obj=process)
 ################################### Parameter Configuaration #######################################
 TERM_NUM = 24
-FORECASTING_NUM = 24
-emb_size = 4
+FORECASTING_NUM = 1
+emb_size = 8
 lstm_dim= 64
 with_rnn =False #False
-hidden_dim = 24 #TODO
+hidden_dim = 12 #TODO note:<TERM_NUM,int<table error
 initial_std = 0.0001
 param_attr = ParamAttr(initial_std=initial_std)
 batch_size = 128 if not is_predict else 1
@@ -43,7 +43,7 @@ pre_speed = data_layer(name='pre_speed', size=TERM_NUM)
 fol_road = data_layer(name='fol_road', size=TERM_NUM)
 time = data_layer(name='time', size=TERM_NUM)
 week = data_layer(name='week', size=TERM_NUM)
-forinput = [pre_road, pre_speed, fol_road] #, time, week
+forinput = [pre_road, pre_speed, fol_road, time, week] #, time, week
 for i in xrange(FORECASTING_NUM):
     # Each task share same weight.
     '''
@@ -64,7 +64,7 @@ for i in xrange(FORECASTING_NUM):
     hidden1 = mixed_layer(
         size=hidden_dim,
         #act=STanhActivation(),
-        #act=SigmoidActivation(),
+        act=SigmoidActivation(),
         bias_attr=True,
         input=[
             full_matrix_projection(pre_road_vec),
