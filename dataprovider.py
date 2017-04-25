@@ -15,7 +15,7 @@
 from paddle.trainer.PyDataProvider2 import *
 import sys
 import numpy as np
-TERM_NUM = 24
+TERM_NUM = 12
 FORECASTING_NUM = 1
 LABEL_VALUE_NUM = 4
 

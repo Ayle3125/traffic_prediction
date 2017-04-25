@@ -21,11 +21,11 @@ process = 'process' if not is_predict else 'process_predict'
 define_py_data_sources2(
     train_list=trn, test_list=tst, module="dataprovider", obj=process)
 ################################### Parameter Configuaration #######################################
-TERM_NUM = 24
+TERM_NUM = 12
 FORECASTING_NUM = 1
 emb_size = 8
 lstm_dim= 64
-with_rnn =False #False
+with_rnn =True #False
 hidden_dim = 12 #TODO note:<TERM_NUM,int<table error
 initial_std = 0.0001
 param_attr = ParamAttr(initial_std=initial_std)
@@ -75,14 +75,45 @@ for i in xrange(FORECASTING_NUM):
             #full_matrix_projection(spd_vec)
             ])
 
-    bi_lstm = bidirectional_lstm(input=hidden1, size=lstm_dim)
-    dropout = dropout_layer(input=bi_lstm, dropout_rate=0.5)
-    #pool = pooling_layer(input=dropout,pooling_type=AvgPooling())
+
+    if with_rnn:
+        rnn1 = recurrent_layer(
+            input=hidden1,
+            act=SigmoidActivation(),
+            bias_attr=True,
+            param_attr=param_attr, )
+
+    hidden2 = mixed_layer(
+        size=hidden_dim,
+        act=STanhActivation(),
+        #act=SigmoidActivation(),
+        bias_attr=True,
+        input=[full_matrix_projection(hidden1)] +
+            ([full_matrix_projection(
+            rnn1, param_attr=ParamAttr(initial_mean=0.0,initial_std=0.0001))] if with_rnn else []), )
+
+    if with_rnn:
+        rnn2 = recurrent_layer(
+            input=hidden2,
+            reverse=True,
+            act=SigmoidActivation(),
+            bias_attr=True,
+            param_attr=ParamAttr(initial_mean=0.0,initial_std=0.0001), )
+    pool_input = mixed_layer(
+        size=hidden_dim,
+        #act=STanhActivation(),
+        act=SigmoidActivation(),
+        bias_attr=True,
+        input=[full_matrix_projection(hidden2)] +
+            ([full_matrix_projection(
+            rnn2, param_attr=ParamAttr(initial_mean=0.0,initial_std=0.0001))] if with_rnn else []), )
+
+    pool = pooling_layer(input=pool_input,pooling_type=AvgPooling())
     score = fc_layer(
         size=4,
         act=SoftmaxActivation(),
         bias_attr=False,
-        input=dropout,)
+        input=pool,)
 
     if is_predict:
         maxid = maxid_layer(score)
