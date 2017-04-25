@@ -21,7 +21,7 @@ process = 'process' if not is_predict else 'process_predict'
 define_py_data_sources2(
     train_list=trn, test_list=tst, module="dataprovider", obj=process)
 ################################### Parameter Configuaration #######################################
-TERM_NUM = 12
+TERM_NUM = 24
 FORECASTING_NUM = 1
 emb_size = 8
 lstm_dim= 64
@@ -32,7 +32,7 @@ param_attr = ParamAttr(initial_std=initial_std)
 batch_size = 128 if not is_predict else 1
 settings(
     batch_size=batch_size,
-    learning_rate=1e-2, #TODO
+    learning_rate=5e-3, #TODO
     regularization=L2Regularization(batch_size * 8e-4),
     learning_method=AdamOptimizer()) #RMSPropOptimizer()) #TODO ())AdaGradOptimizer
 ################################### Algorithm Configuration ########################################

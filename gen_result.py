@@ -19,9 +19,9 @@ with open('./rank-00000') as f:
         #raw prediction range from 0 to 3
         res.append([i + 1 for i in pred])
 
-file_name = open('./data/pred.list').read().strip('\r\n')
-
-FORECASTING_NUM = 24
+file_name = open('./data/pred_res.list').read().strip('\r\n')
+FORECASTING_NUM = 1
+'''
 header = [
     'id',
     '201604200805',
@@ -49,13 +49,26 @@ header = [
     '201604200955',
     '201604201000',
 ]
+'''
 ###################
 ## To CSV format ##
 ###################
-with open(file_name) as f:
-    f.next()
-    print ','.join(header)
+file_lines=[]
+with open(file_name,'r') as f:
+    #f.next()
+    file_lines = f.readlines()
+    time_last = int(file_lines[0].rstrip('\r\n').split(",")[-1])
+    time_now = time_last+5
+    if (time_now%100 >= 60 ):
+        time_now = ( time_now/100 + 1 ) *100
+    file_lines[0] = file_lines[0].rstrip('\r\n') + ',' +  str(time_now )+'\n'
+    for i in range(1,len(file_lines)):#no header
+        file_lines[i] = file_lines[i].rstrip('\r\n') + ',' + ','.join(map(str, res[i-1]))+'\n'
+with open(file_name,'w') as f:
+    f.writelines(file_lines)
+    '''
     for row_num, line in enumerate(f):
         fields = line.rstrip('\r\n').split(',')
         linkid = fields[0]
         print linkid + ',' + ','.join(map(str, res[row_num]))
+    '''

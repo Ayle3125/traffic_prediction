@@ -45,7 +45,7 @@ def process_graph():
     for key,value in sum_start.items():
         print key,value,sum_end.get(key, 0)
 
-def process():
+def process(infile_name, outfile_name):
     sum_start = {}
     sum_end = {}
     with open("graph.csv") as f:
@@ -65,7 +65,7 @@ def process():
                 sum_end[end] = [start]
 
     sum_speed = {}
-    with open("speeds.csv") as f:
+    with open(infile_name) as f:
         #abandon fields name
         line = f.readline()
         time_sequence = line.rstrip('\r\n').split(",")[1:]
@@ -85,7 +85,6 @@ def process():
 
         for row_num, line in enumerate(f):
             _tmp_speeds = map(int, line.rstrip('\r\n').split(","))
-
             road_id =  _tmp_speeds[0]
             sum_speed[ road_id ] = _tmp_speeds[1:]
             # Get the max index.
@@ -123,8 +122,8 @@ def process():
                 _fol_speed[i]=0
             else:
                 _fol_speed[i] = _sum/_sum_num
-    with open("speeds.csv",'r') as f_in:
-        with open("new_speed.csv",'w') as f_out:
+    with open(infile_name,'r') as f_in:
+        with open(outfile_name,'w') as f_out:
             f_spd = csv.reader(f_in)
             headers = next(f_spd)
             csv_out = csv.writer(f_out)
@@ -190,5 +189,5 @@ def test(file_name):
 
 #process_gap()
 #process_graph()
-#process()
-test("new_speed.csv")
+process(infile_name="speeds.csv",outfile_name="new_speed.csv")
+#test("new_speed.csv")

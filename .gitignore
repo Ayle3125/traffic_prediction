@@ -4,5 +4,7 @@ output/
 *.png
 *.log
 data/*.csv
+data/*.bak
 *.csv
 *.pyc
+rank*

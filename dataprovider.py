@@ -15,7 +15,7 @@
 from paddle.trainer.PyDataProvider2 import *
 import sys
 import numpy as np
-TERM_NUM = 12
+TERM_NUM = 24
 FORECASTING_NUM = 1
 LABEL_VALUE_NUM = 4
 
@@ -107,15 +107,8 @@ def predict_initHook(settings, file_list, **kwargs):
         settings.input_types =[integer_value_sequence(TERM_NUM) ,
                                 integer_value_sequence(TERM_NUM) ,
                                 integer_value_sequence(TERM_NUM) ,
-
                                 integer_value_sequence(TERM_NUM) ,
-                                integer_value_sequence(TERM_NUM) ,
-                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),
-                                integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),integer_value(LABEL_VALUE_NUM),]
+                                integer_value_sequence(TERM_NUM) ,]
 
 
 @provider(init_hook=predict_initHook, should_shuffle=False)
@@ -148,7 +141,9 @@ def process_predict(settings, file_name):
             _fol_road = map(int, line3.rstrip('\r\n').split(",")[1:])
             end_time = len(speeds)-1
             # Scanning and generating samples
-            pre_spd = map(int, speeds[end_time - TERM_NUM:end_time])
+            pre_road = map(int, _pre_road[i - TERM_NUM:i])
+            pre_spd = map(int, speeds[i - TERM_NUM:i])
+            fol_road = map(int, _fol_road[end_time - TERM_NUM:end_time])
             pre_time = map(int, time[end_time - TERM_NUM:end_time])
             pre_week = map(int, week[end_time - TERM_NUM:end_time])
             yield [pre_road, pre_spd, fol_road, pre_time, pre_week]
